@@ -36,6 +36,22 @@ def count_moves(board):
     return count_x, count_o, count_space
 
 
+def cell_is_not_empty(board, row, column):
+    if board[row][column] == "X" or board[row][column] == "O":
+        return True
+
+
+def ai_move_input(board):
+    print("AI making move level 'easy'")
+    row = random.randint(0, 2)
+    column = random.randint(0, 2)
+    if cell_is_not_empty(board, row, column):
+        return ai_move_input(board)
+    else:
+        board[row][column] = "O"
+        return board
+
+
 def player_move_input(board):
     print("Enter the coordinates:")
     move = str(input()).split()
@@ -51,19 +67,15 @@ def player_move_input(board):
     row = int(row) - 1
     column = int(column) - 1
 
-    if board[row][column] == "X" or board[row][column] == "O":
+    if cell_is_not_empty(board, row, column):
         print("This cell is occupied! Choose another one!")
         return player_move_input(board)
 
-    count_x, count_o, _ = count_moves(board)
-    if count_x <= count_o:
-        board[row][column] = "X"
-    else:
-        board[row][column] = "O"
+    board[row][column] = "X"
     return board
 
 
-def horizontal_or_vertical_result(board):
+def horizontal_or_vertical_line_result_check(board):
     for row in range(len(board)):
         if "".join(board[row]) == "XXX":
             return "X wins"
@@ -86,11 +98,11 @@ def game_state(board):
             if row == len(board) - column - 1:
                 second_diagonal_result.append(board[row][column])
 
-    result = horizontal_or_vertical_result(board)
+    result = horizontal_or_vertical_line_result_check(board)
     if result is not None:
         return result
 
-    result = horizontal_or_vertical_result(rotated_board)
+    result = horizontal_or_vertical_line_result_check(rotated_board)
     if result is not None:
         return result
 
@@ -112,6 +124,7 @@ def game(board):
     while game_state(board) == "Game not finished":
 
         print_game_board(player_move_input(board))
+        print_game_board(ai_move_input(board))
 
         print(game_state(board))
 
