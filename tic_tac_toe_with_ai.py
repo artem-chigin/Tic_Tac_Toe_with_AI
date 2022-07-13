@@ -41,27 +41,26 @@ def cell_is_not_empty(board, row, column):
         return True
 
 
-def ai_move_input(board):
-    print("AI making move level 'easy'")
+def ai_move_input(board, character):
     row = random.randint(0, 2)
     column = random.randint(0, 2)
     if cell_is_not_empty(board, row, column):
-        return ai_move_input(board)
+        return ai_move_input(board, character)
     else:
-        board[row][column] = "O"
+        board[row][column] = character
         return board
 
 
-def player_move_input(board):
+def player_move_input(board, character):
     print("Enter the coordinates:")
     move = str(input()).split()
     # print(move)
     if not all(map(lambda x: True if x.isdigit() else False, move)):
         print("You should enter numbers!")
-        return player_move_input(board)
+        return player_move_input(board, character)
     if not all(map(lambda x: True if x in {"1", "2", "3"} else False, move)):
         print("Coordinates should be from 1 to 3!")
-        return player_move_input(board)
+        return player_move_input(board, character)
 
     row, column = move
     row = int(row) - 1
@@ -69,9 +68,9 @@ def player_move_input(board):
 
     if cell_is_not_empty(board, row, column):
         print("This cell is occupied! Choose another one!")
-        return player_move_input(board)
+        return player_move_input(board, character)
 
-    board[row][column] = "X"
+    board[row][column] = character
     return board
 
 
@@ -118,18 +117,47 @@ def game_state(board):
     return "Game not finished"
 
 
-def game(board):
+def game_menu():
+    print("Enter 'start' or 'exit'")
+    command = input().split()
+    if len(command) == 1 and command[0] == "exit":
+        return command
+    elif len(command) == 3 and command[0] == "start" and (command[1] == "user" or command[1] == "easy")\
+                           and (command[2] == "user" or command[2] == "easy"):
+        return command
+    else:
+        print("Bad parameters!")
+        return game_menu()
+
+
+def game(board, command):
     print_game_board(board)
 
     while game_state(board) == "Game not finished":
 
-        print_game_board(player_move_input(board))
-        print_game_board(ai_move_input(board))
+        if command[1] == "user":
+            print_game_board(player_move_input(board, "X"))
+        else:
+            print("AI making move level 'easy'")
+            print_game_board(ai_move_input(board, "X"))
+
+        print(game_state(board))
+        if game_state(board) != "Game not finished":
+            break
+
+        if command[2] == "user":
+            print_game_board(player_move_input(board, "O"))
+        else:
+            print("AI making move level 'easy'")
+            print_game_board(ai_move_input(board, "O"))
 
         print(game_state(board))
 
 
-print("Enter the cells:")
+# print("Enter the cells:")
 game_board = input_initial_board_state()
 
-game(game_board)
+menu_command = game_menu()
+while menu_command != ["exit"]:
+    game(game_board, menu_command)
+    menu_command = game_menu()
