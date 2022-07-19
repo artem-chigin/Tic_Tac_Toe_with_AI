@@ -19,23 +19,30 @@ def print_game_board(value):
 
 
 def count_moves(board):
-    count_x = 0
-    count_o = 0
+    # count_x = 0
+    # count_o = 0
     count_space = 0
+    space_indexes = []
     for row in range(len(board)):
         for column in range(len(board[row])):
-            if board[row][column] == "X":
-                count_x += 1
-            elif board[row][column] == "O":
-                count_o += 1
-            elif board[row][column] == " ":
+    #         if board[row][column] == "X":
+    #             count_x += 1
+    #         elif board[row][column] == "O":
+    #             count_o += 1
+    #         elif board[row][column] == " ":
+    #             count_space += 1
+    #             space_indexes.append((row, column))
+    # return count_x, count_o, count_space, space_indexes
+            if board[row][column] == " ":
                 count_space += 1
-    return count_x, count_o, count_space
+                space_indexes.append((row, column))
+    return count_space, space_indexes
 
 
 def cell_is_not_empty(board, row, column):
     if board[row][column] == "X" or board[row][column] == "O":
         return True
+
 
 def player_move_input(board, character):
     print("Enter the coordinates:")
@@ -66,6 +73,7 @@ def horizontal_or_vertical_line_result_check(board):
             return "X wins"
         elif "".join(board[row]) == "OOO":
             return "O wins"
+
 
 def parsing_board(board):
     main_diagonal_result = []
@@ -101,7 +109,9 @@ def game_state(board):
     elif "".join(main_diagonal_result) == "OOO" or "".join(second_diagonal_result) == "OOO":
         return "O wins"
 
-    _, _, space_fields_count = count_moves(board)
+    # _, _, space_fields_count = count_moves(board)
+    space_fields_count, _ = count_moves(board)
+
     if space_fields_count == 0:
         return "Draw"
 
