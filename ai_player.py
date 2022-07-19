@@ -91,20 +91,26 @@ class HardAi(MediumAi):
         move = None
         best_score = - math.inf
         virtual_board = self.board.copy()
-        for row in range(3):
-            for column in range(3):
-                if virtual_board[row][column] == " ":
-                    virtual_board[row][column] = self.character
-                    score = self.minmax(virtual_board, False)
-                    virtual_board[row][column] = " "
-                    if score > best_score:
-                        best_score = score
-                        move = (row, column)
-        row, column = move
-        self.board[row][column] = self.character
-        return self.board
+        spaces_count, space_indexes = game_board.count_moves(virtual_board)
+        if spaces_count == 9:
+            self.board[1][1] = self.character
+            return self.board
+        else:
+
+            for row, column in space_indexes:
+                virtual_board[row][column] = self.character
+                score = self.minmax(virtual_board, False)
+                virtual_board[row][column] = " "
+                if score > best_score:
+                    best_score = score
+                    move = (row, column)
+            row, column = move
+            self.board[row][column] = self.character
+            return self.board
 
     def minmax(self, board, is_ai_turn):
+        spaces, indexes = game_board.count_moves(board)
+
         if game_board.game_state(board) == "X wins" and self.character == "X" \
                 or game_board.game_state(board) == "O wins" and self.character == "O":
             return 100
@@ -116,21 +122,17 @@ class HardAi(MediumAi):
 
         if is_ai_turn:
             best_score = - math.inf
-            for row in range(len(board)):
-                for column in range(len(board)):
-                    if board[row][column] == " ":
-                        board[row][column] = self.character
-                        score = self.minmax(board, False)
-                        board[row][column] = " "
-                        best_score = max(best_score, score)
+            for row, column in indexes:
+                board[row][column] = self.character
+                score = self.minmax(board, False)
+                board[row][column] = " "
+                best_score = max(best_score, score)
         else:
             best_score = math.inf
-            for row in range(len(board)):
-                for column in range(len(board)):
-                    if board[row][column] == " ":
-                        board[row][column] = self.enemy_character
-                        score = self.minmax(board, True)
-                        board[row][column] = " "
-                        best_score = min(best_score, score)
-        return best_score
+            for row, column in indexes:
+                board[row][column] = self.enemy_character
+                score = self.minmax(board, True)
+                board[row][column] = " "
+                best_score = min(best_score, score)
 
+        return best_score
